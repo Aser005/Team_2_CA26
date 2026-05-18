@@ -36,6 +36,8 @@ void fetch() {
     PC++;
 }
 
+
+
 int main(void) {
    FILE *file = fopen("/Users/asere/CLionProjects/ca project/text file.txt", "r"); //i open the file in read mode
     if (file == NULL) {
