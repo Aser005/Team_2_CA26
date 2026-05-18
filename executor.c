@@ -24,7 +24,7 @@ extern int operand2Value;
 extern int registers[32];
 
 extern int ALUResult;
-extern int storeValue;
+extern int storeValue; 
 
 int ALU(int input1, int input2, int operation) {
 
