@@ -2,6 +2,8 @@
 #include <string.h>
 #include "encoder.h"
 #include "decoder.h"
+#include "executor.h"
+
 
 unsigned int memory[2048];
 int registers[32];
@@ -22,6 +24,10 @@ int address;
 
 int operand1Value;
 int operand2Value;
+
+int ALUResult;
+int memoryData;
+int storeValue;
 
 
 

@@ -8,4 +8,6 @@ add_executable(untitled main.c
         encoder.c
         decoder.h
         decoder.c
-        executor.h)
+        executor.h
+        executor.c
+)
