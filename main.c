@@ -37,6 +37,33 @@ void fetch() {
 }
 
 
+void memoryStage() {
+    if (opcode == 10) {
+        memoryData = memory[ALUResult];
+    } else if (opcode == 11) {
+        memory[ALUResult] = storeValue;
+    }
+}
+
+void writeBack() {
+
+    if (resultRegister == 0) {
+        return;
+    }
+
+    if (opcode == 0 || opcode == 1 || opcode == 2 ||
+        opcode == 3 || opcode == 5 || opcode == 6 ||
+        opcode == 8 || opcode == 9) {
+
+        registers[resultRegister] = ALUResult;
+        }
+
+    else if (opcode == 10) { // MOVR
+        registers[resultRegister] = memoryData;
+    }
+}
+
+
 
 int main(void) {
    FILE *file = fopen("/Users/asere/CLionProjects/ca project/text file.txt", "r"); //i open the file in read mode
@@ -63,6 +90,9 @@ int main(void) {
 
     fetch();
     decode();
+    execute();
+    memoryStage();
+    writeBack();
 
     printf("opcode = %d\n", opcode);
     printf("resultRegister = %d\n", resultRegister);
