@@ -7,7 +7,7 @@
 #include <string.h>
 #include "encoder.h"
 
-// This function converts instruction name to opcode
+
 int getOpcode(char name[10]) {
     if (strcmp(name, "ADD") == 0) return 0;
     if (strcmp(name, "SUB") == 0) return 1;
