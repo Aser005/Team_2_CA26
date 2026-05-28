@@ -8,6 +8,7 @@
 unsigned int memory[2048];
 int registers[32];
 int PC=0;
+int clock = 1;
 
 int instructionAddress = 0;
 int branchTaken = 0;
@@ -53,6 +54,7 @@ int MEM_WB_instrNum;
 
 int EX_cycle = 0;
 int ID_cycle = 0;
+int nextFetchCycle = 1;
 
 
 void fetch() {
@@ -189,7 +191,7 @@ int main(void) {
 
     fclose(file);
 
-    int clock = 1;
+    // int clock = 1;
 
     while (memory[PC] != 0 ||
            IF_ID_valid == 1 ||
@@ -209,7 +211,7 @@ int main(void) {
 
         writeBack();
 
-        if (clock % 2 == 0) {
+        if (clock != nextFetchCycle) {
             if (EX_MEM_valid == 1) {
                 sprintf(MEM_text, "Instruction %d", EX_MEM_instrNum);
             }
@@ -229,12 +231,13 @@ int main(void) {
 
         decode();
 
-        if (clock % 2 == 1) {
+        if (clock == nextFetchCycle) {
             if (branchTaken == 0 && memory[PC] != 0) {
                 sprintf(IF_text, "Instruction %d", PC + 1);
             }
 
             fetch();
+            nextFetchCycle = clock + 2;
         }
 
         printf("\nClock Cycle %d\n", clock);
@@ -244,7 +247,7 @@ int main(void) {
         printf("MEM : %s\n", MEM_text);
         printf("WB  : %s\n", WB_text);
 
-        branchTaken = 0;
+         branchTaken = 0;
         clock++;
     }
 

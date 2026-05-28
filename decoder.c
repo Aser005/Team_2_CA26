@@ -1,6 +1,4 @@
-//
-// Created by Aser Elserwee on 17/05/2026.
-//
+
 
 #include "decoder.h"
 #include "encoder.h"
@@ -55,7 +53,7 @@ void decodeI() {
     ID_EX_operand1Register = (IF_ID_IR >> 18) & 0x1F;
     ID_EX_immediate        = signExtend18(IF_ID_IR & 0x3FFFF);
 
-   
+
 }
 
 

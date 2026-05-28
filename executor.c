@@ -42,6 +42,8 @@ extern int IF_ID_instrNum;
 
 
 extern int branchTaken;
+extern int nextFetchCycle;
+extern int clock;
 
 // ALU function
 int ALU(int input1, int input2, int operation) {
@@ -105,6 +107,7 @@ void execute() {
 
             ID_cycle = 0;
             branchTaken = 1;
+            nextFetchCycle = clock + 1;
         }
 
     }
@@ -120,6 +123,7 @@ void execute() {
         IF_ID_valid = 0;
         ID_cycle = 0;
         branchTaken = 1;
+        nextFetchCycle = clock + 1;
     }
     else if (ID_EX_opcode == 8) {          // LSL
         EX_MEM_ALUResult = ALU(ID_EX_operand1Value, ID_EX_shamt, 5);
