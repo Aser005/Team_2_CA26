@@ -46,8 +46,7 @@ void decodeR() {
     ID_EX_operand2Register = (IF_ID_IR >> 13) & 0x1F;
     ID_EX_shamt            = IF_ID_IR & 0x1FFF;
 
-    ID_EX_operand1Value    = registers[ID_EX_operand1Register];
-    ID_EX_operand2Value    = registers[ID_EX_operand2Register];
+
 }
 
 
@@ -56,7 +55,7 @@ void decodeI() {
     ID_EX_operand1Register = (IF_ID_IR >> 18) & 0x1F;
     ID_EX_immediate        = signExtend18(IF_ID_IR & 0x3FFFF);
 
-    ID_EX_operand1Value    = registers[ID_EX_operand1Register];
+   
 }
 
 

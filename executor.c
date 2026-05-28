@@ -77,6 +77,10 @@ void execute() {
     EX_MEM_resultRegister = ID_EX_resultRegister;
     EX_MEM_instrNum = ID_EX_instrNum;
     EX_MEM_valid = 1;
+
+    ID_EX_operand1Value = registers[ID_EX_operand1Register];
+    ID_EX_operand2Value = registers[ID_EX_operand2Register];
+
     ID_EX_valid = 0;
 
 
