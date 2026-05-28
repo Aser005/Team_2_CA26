@@ -68,7 +68,9 @@ void fetch() {
         IF_ID_PC = PC;
         IF_ID_instrNum = PC + 1;
         IF_ID_valid = 1;
+        printf("IF Inputs: PC = %d\n", PC);
         PC++;
+
     } else {
         IF_ID_valid = 0;
     }
@@ -90,6 +92,10 @@ void memoryStage() {
     }
     else if (EX_MEM_opcode == 11) { // MOVM
         memory[EX_MEM_ALUResult] = EX_MEM_storeValue;
+
+         printf("Memory Update: Memory[%d] = %d\n",
+           EX_MEM_ALUResult,
+           EX_MEM_storeValue);
     }
 
     MEM_WB_valid = 1;
@@ -119,10 +125,18 @@ void writeBack() {
         MEM_WB_opcode == 9) {  // LSR
 
         registers[MEM_WB_resultRegister] = MEM_WB_ALUResult;
+
+        printf("Register Update: R%d = %d\n",
+             MEM_WB_resultRegister,
+             MEM_WB_ALUResult);
         }
     // MOVR
     else if (MEM_WB_opcode == 10) {
         registers[MEM_WB_resultRegister] = MEM_WB_memoryData;
+
+        printf("Register Update: R%d = %d\n",
+             MEM_WB_resultRegister,
+             MEM_WB_memoryData);
     }
 
 

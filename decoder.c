@@ -91,6 +91,8 @@ void decode() {
 
     int opcode = IF_ID_IR >> 28;
     ID_EX_opcode = opcode;
+  
+
 
     if (opcode == 0 || opcode == 1 || opcode == 2 ||
         opcode == 5 || opcode == 8 || opcode == 9) {
