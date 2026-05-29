@@ -68,7 +68,7 @@ void fetch() {
         IF_ID_PC = PC;
         IF_ID_instrNum = PC + 1;
         IF_ID_valid = 1;
-        printf("IF Inputs: PC = %d\n", PC);
+        // printf("IF Inputs: PC = %d\n", PC);
         PC++;
 
     } else {
@@ -172,13 +172,8 @@ int main(void) {
 
     char line[100];
 
-    for (int i = 0; i < 2048; i++) {
-        memory[i] = 0;
-    }
-
-    for (int i = 0; i < 32; i++) {
-        registers[i] = 0;
-    }
+    for (int i = 0; i < 2048; i++) memory[i] = 0;
+    for (int i = 0; i < 32; i++) registers[i] = 0;
 
     PC = 0;
     instructionAddress = 0;
@@ -191,21 +186,19 @@ int main(void) {
     ID_cycle = 0;
     EX_cycle = 0;
     branchTaken = 0;
+    nextFetchCycle = 1;
+    clock = 1;
 
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
 
-        if (strlen(line) == 0) {
-            continue;
-        }
+        if (strlen(line) == 0) continue;
 
         memory[instructionAddress] = encodeInstruction(line);
         instructionAddress++;
     }
 
     fclose(file);
-
-    // int clock = 1;
 
     while (memory[PC] != 0 ||
            IF_ID_valid == 1 ||
@@ -218,6 +211,10 @@ int main(void) {
         char EX_text[50] = "Empty";
         char MEM_text[50] = "Empty";
         char WB_text[50] = "Empty";
+
+        char IF_inputs[100] = "";
+        char ID_inputs[150] = "";
+        char EX_inputs[200] = "";
 
         if (MEM_WB_valid == 1) {
             sprintf(WB_text, "Instruction %d", MEM_WB_instrNum);
@@ -234,13 +231,31 @@ int main(void) {
         }
 
         if (ID_EX_valid == 1) {
+            int op1 = registers[ID_EX_operand1Register];
+            int op2 = registers[ID_EX_operand2Register];
+
             sprintf(EX_text, "Instruction %d", ID_EX_instrNum);
+
+            sprintf(EX_inputs,
+                    "EX Inputs: Opcode=%s, Operand1=%d, Operand2=%d, Immediate=%d, Shamt=%d",
+                    opcodeName(ID_EX_opcode),
+                    op1,
+                    op2,
+                    ID_EX_immediate,
+                    ID_EX_shamt);
         }
 
         execute();
 
         if (IF_ID_valid == 1) {
+            int opcode = IF_ID_IR >> 28;
+
             sprintf(ID_text, "Instruction %d", IF_ID_instrNum);
+
+            sprintf(ID_inputs,
+                    "ID Inputs: PC=%d, Opcode=%s",
+                    IF_ID_PC,
+                    opcodeName(opcode));
         }
 
         decode();
@@ -248,6 +263,10 @@ int main(void) {
         if (clock == nextFetchCycle) {
             if (branchTaken == 0 && memory[PC] != 0) {
                 sprintf(IF_text, "Instruction %d", PC + 1);
+
+                sprintf(IF_inputs,
+                        "IF Inputs: PC=%d",
+                        PC);
             }
 
             fetch();
@@ -261,7 +280,19 @@ int main(void) {
         printf("MEM : %s\n", MEM_text);
         printf("WB  : %s\n", WB_text);
 
-         branchTaken = 0;
+        if (strlen(IF_inputs) > 0) {
+            printf("%s\n", IF_inputs);
+        }
+
+        if (strlen(ID_inputs) > 0) {
+            printf("%s\n", ID_inputs);
+        }
+
+        if (strlen(EX_inputs) > 0) {
+            printf("%s\n", EX_inputs);
+        }
+
+        branchTaken = 0;
         clock++;
     }
 
