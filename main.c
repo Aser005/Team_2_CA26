@@ -222,7 +222,7 @@ int main(void) {
 
         writeBack();
 
-        if (clock != nextFetchCycle) {
+        if (clock != nextFetchCycle|| PC >= instructionAddress) {
             if (EX_MEM_valid == 1) {
                 sprintf(MEM_text, "Instruction %d", EX_MEM_instrNum);
             }
