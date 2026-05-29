@@ -56,6 +56,9 @@ int EX_cycle = 0;
 int ID_cycle = 0;
 int nextFetchCycle = 1;
 
+char regUpdate[100] = "";
+char memUpdate[100] = "";
+
 
 void fetch() {
     if (branchTaken == 1) {
@@ -93,9 +96,10 @@ void memoryStage() {
     else if (EX_MEM_opcode == 11) { // MOVM
         memory[EX_MEM_ALUResult] = EX_MEM_storeValue;
 
-         printf("Memory Update: Memory[%d] = %d\n",
-           EX_MEM_ALUResult,
-           EX_MEM_storeValue);
+        sprintf(memUpdate,
+       "Memory Update: Memory[%d] = %d",
+       EX_MEM_ALUResult,
+       EX_MEM_storeValue);
     }
 
     MEM_WB_valid = 1;
@@ -126,17 +130,19 @@ void writeBack() {
 
         registers[MEM_WB_resultRegister] = MEM_WB_ALUResult;
 
-        printf("Register Update: R%d = %d\n",
-             MEM_WB_resultRegister,
-             MEM_WB_ALUResult);
+        sprintf(regUpdate,
+         "Register Update: R%d = %d",
+         MEM_WB_resultRegister,
+         MEM_WB_ALUResult);
         }
     // MOVR
     else if (MEM_WB_opcode == 10) {
         registers[MEM_WB_resultRegister] = MEM_WB_memoryData;
 
-        printf("Register Update: R%d = %d\n",
-             MEM_WB_resultRegister,
-             MEM_WB_memoryData);
+        sprintf(regUpdate,
+        "Register Update: R%d = %d",
+        MEM_WB_resultRegister,
+        MEM_WB_memoryData);
     }
 
 
@@ -214,7 +220,10 @@ int main(void) {
 
         char IF_inputs[100] = "";
         char ID_inputs[150] = "";
-        char EX_inputs[200] = "";
+        char EX_inputs[250] = "";
+
+        regUpdate[0] = '\0';
+        memUpdate[0] = '\0';
 
         if (MEM_WB_valid == 1) {
             sprintf(WB_text, "Instruction %d", MEM_WB_instrNum);
@@ -222,7 +231,7 @@ int main(void) {
 
         writeBack();
 
-        if (clock != nextFetchCycle|| PC >= instructionAddress) {
+        if (clock != nextFetchCycle || memory[PC] == 0) {
             if (EX_MEM_valid == 1) {
                 sprintf(MEM_text, "Instruction %d", EX_MEM_instrNum);
             }
@@ -231,18 +240,83 @@ int main(void) {
         }
 
         if (ID_EX_valid == 1) {
-            int op1 = registers[ID_EX_operand1Register];
-            int op2 = registers[ID_EX_operand2Register];
+
+            int r1Value = registers[ID_EX_resultRegister];
+            int r2Value = registers[ID_EX_operand1Register];
+            int r3Value = registers[ID_EX_operand2Register];
 
             sprintf(EX_text, "Instruction %d", ID_EX_instrNum);
 
-            sprintf(EX_inputs,
-                    "EX Inputs: Opcode=%s, Operand1=%d, Operand2=%d, Immediate=%d, Shamt=%d",
-                    opcodeName(ID_EX_opcode),
-                    op1,
-                    op2,
-                    ID_EX_immediate,
-                    ID_EX_shamt);
+            if (ID_EX_opcode == 0 || ID_EX_opcode == 1 ||
+                ID_EX_opcode == 2 || ID_EX_opcode == 5) {
+
+                sprintf(EX_inputs,
+                        "EX Inputs: Opcode=%s, R1=R%d, R2=R%d(%d), R3=R%d(%d)",
+                        opcodeName(ID_EX_opcode),
+                        ID_EX_resultRegister,
+                        ID_EX_operand1Register, r2Value,
+                        ID_EX_operand2Register, r3Value);
+            }
+            else if (ID_EX_opcode == 3) {
+
+                sprintf(EX_inputs,
+                        "EX Inputs: Opcode=%s, R1=R%d, Immediate=%d",
+                        opcodeName(ID_EX_opcode),
+                        ID_EX_resultRegister,
+                        ID_EX_immediate);
+            }
+            else if (ID_EX_opcode == 4) {
+
+                sprintf(EX_inputs,
+                        "EX Inputs: Opcode=%s, R1=R%d(%d), R2=R%d(%d), Immediate=%d",
+                        opcodeName(ID_EX_opcode),
+                        ID_EX_resultRegister, r1Value,
+                        ID_EX_operand1Register, r2Value,
+                        ID_EX_immediate);
+            }
+            else if (ID_EX_opcode == 6) {
+
+                sprintf(EX_inputs,
+                        "EX Inputs: Opcode=%s, R1=R%d, R2=R%d(%d), Immediate=%d",
+                        opcodeName(ID_EX_opcode),
+                        ID_EX_resultRegister,
+                        ID_EX_operand1Register, r2Value,
+                        ID_EX_immediate);
+            }
+            else if (ID_EX_opcode == 7) {
+
+                sprintf(EX_inputs,
+                        "EX Inputs: Opcode=%s, Address=%d",
+                        opcodeName(ID_EX_opcode),
+                        ID_EX_address);
+            }
+            else if (ID_EX_opcode == 8 || ID_EX_opcode == 9) {
+
+                sprintf(EX_inputs,
+                        "EX Inputs: Opcode=%s, R1=R%d, R2=R%d(%d), Shamt=%d",
+                        opcodeName(ID_EX_opcode),
+                        ID_EX_resultRegister,
+                        ID_EX_operand1Register, r2Value,
+                        ID_EX_shamt);
+            }
+            else if (ID_EX_opcode == 10) {
+
+                sprintf(EX_inputs,
+                        "EX Inputs: Opcode=%s, R1=R%d, Base=R%d(%d), Immediate=%d",
+                        opcodeName(ID_EX_opcode),
+                        ID_EX_resultRegister,
+                        ID_EX_operand1Register, r2Value,
+                        ID_EX_immediate);
+            }
+            else if (ID_EX_opcode == 11) {
+
+                sprintf(EX_inputs,
+                        "EX Inputs: Opcode=%s, StoreReg=R%d(%d), Base=R%d(%d), Immediate=%d",
+                        opcodeName(ID_EX_opcode),
+                        ID_EX_resultRegister, r1Value,
+                        ID_EX_operand1Register, r2Value,
+                        ID_EX_immediate);
+            }
         }
 
         execute();
@@ -290,6 +364,14 @@ int main(void) {
 
         if (strlen(EX_inputs) > 0) {
             printf("%s\n", EX_inputs);
+        }
+
+        if (strlen(memUpdate) > 0) {
+            printf("%s\n", memUpdate);
+        }
+
+        if (strlen(regUpdate) > 0) {
+            printf("%s\n", regUpdate);
         }
 
         branchTaken = 0;
